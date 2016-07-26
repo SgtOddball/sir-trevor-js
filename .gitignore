@@ -5,3 +5,9 @@ _SpecRunner.html
 bower_components/
 components/
 .grunt
+website/.bundle/
+website/bower_components/
+website/build/
+website/vendor/
+build/*.test.*
+build/*.debug.*

@@ -6,9 +6,9 @@
 */
 
 var _ = require('../lodash');
-var $ = require('jquery');
 var config = require('../config');
 var utils = require('../utils');
+var Ajax = require('../packages/ajax');
 
 var EventBus = require('../event-bus');
 
@@ -18,48 +18,50 @@ module.exports = function(block, file, success, error) {
 
   var uid  = [block.blockID, (new Date()).getTime(), 'raw'].join('-');
   var data = new FormData();
+  var attachmentName = block.attachmentName || config.defaults.attachmentName;
+  var attachmentFile = block.attachmentFile || config.defaults.attachmentFile;
+  var attachmentUid = block.attachmentUid || config.defaults.attachmentUid;
 
-  data.append('attachment[name]', file.name);
-  data.append('attachment[file]', file);
-  data.append('attachment[uid]', uid);
+  data.append(attachmentName, file.name);
+  data.append(attachmentFile, file);
+  data.append(attachmentUid, uid);
 
   block.resetMessages();
 
   var callbackSuccess = function(data) {
     utils.log('Upload callback called');
-    EventBus.trigger('onUploadStop');
+    EventBus.trigger('onUploadStop', data);
 
     if (!_.isUndefined(success) && _.isFunction(success)) {
-      success.apply(block, arguments);
+      success.apply(block, arguments, data);
     }
+
+    block.removeQueuedItem(uid);
   };
 
   var callbackError = function(jqXHR, status, errorThrown) {
     utils.log('Upload callback error called');
-    EventBus.trigger('onUploadStop');
+    EventBus.trigger('onUploadStop', undefined, errorThrown, status, jqXHR);
 
     if (!_.isUndefined(error) && _.isFunction(error)) {
       error.call(block, status);
     }
+
+    block.removeQueuedItem(uid);
   };
 
   var url = block.uploadUrl || config.defaults.uploadUrl;
 
-  var xhr = $.ajax({
-    url: url,
-    data: data,
-    cache: false,
-    contentType: false,
-    processData: false,
-    dataType: 'json',
-    type: 'POST'
+  var xhr = Ajax.fetch(url, {
+    body: data,
+    method: 'POST',
+    dataType: 'json'
   });
 
   block.addQueuedItem(uid, xhr);
 
-  xhr.done(callbackSuccess)
-     .fail(callbackError)
-     .always(block.removeQueuedItem.bind(block, uid));
+  xhr.then(callbackSuccess)
+     .catch(callbackError);
 
   return xhr;
 };

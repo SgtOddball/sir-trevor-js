@@ -2,7 +2,7 @@
 
 var drop_options = {
   html: ['<div class="st-block__dropzone">',
-    '<span class="st-icon"><%= _.result(block, "icon_name") %></span>',
+    '<svg role="img" class="st-icon"><use xlink:href="<%= config.defaults.iconUrl %>#<%= _.result(block, "icon_name") %>"/></svg>',
     '<p><%= i18n.t("general:drop", { block: "<span>" + _.result(block, "title") + "</span>" }) %>',
     '</p></div>'].join('\n'),
     re_render_on_reorder: false
@@ -55,7 +55,11 @@ module.exports = {
     blockTypeLimits: {},
     required: [],
     uploadUrl: '/attachments',
+    attachmentName: 'attachment[name]',
+    attachmentFile: 'attachment[file]',
+    attachmentUid: 'attachment[uid]',
     baseImageUrl: '/sir-trevor-uploads/',
+    iconUrl: '../src/icons/sir-trevor-icons.svg',
     errorsContainer: undefined,
     convertFromMarkdown: true,
     citeRequired: false,
@@ -64,6 +68,7 @@ module.exports = {
         {
           name: "Bold",
           title: "bold",
+          iconName: "fmt-bold",
           cmd: "bold",
           keyCode: 66,
           text : "B"
@@ -71,6 +76,7 @@ module.exports = {
         {
           name: "Italic",
           title: "italic",
+          iconName: "fmt-italic",
           cmd: "italic",
           keyCode: 73,
           text : "i"
@@ -78,18 +84,35 @@ module.exports = {
         {
           name: "Link",
           title: "link",
-          iconName: "link",
+          iconName: "fmt-link",
           cmd: "linkPrompt",
           text : "link",
         },
         {
           name: "Unlink",
           title: "unlink",
-          iconName: "link",
+          iconName: "fmt-unlink",
           cmd: "unlink",
           text : "link",
         },
+        {
+          name: "Heading",
+          title: "heading",
+          iconName: "fmt-heading",
+          cmd: "heading",
+          text: "heading"
+        },
+        {
+          name: "Quote",
+          title: "quote",
+          iconName: "fmt-quote",
+          cmd: "quote",
+          text: "quote"
+        }
       ],
     },
+    ajaxOptions: {
+      headers: {}
+    }
   }
 };

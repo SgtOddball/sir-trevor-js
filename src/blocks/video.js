@@ -19,8 +19,7 @@ module.exports = Block.extend({
   },
 
   type: 'video',
-  title: function() { return i18n.t('blocks:video:title'); },
-
+  
   droppable: true,
   pastable: true,
 
@@ -37,13 +36,12 @@ module.exports = Block.extend({
     var aspectRatioClass = source.square ?
       'with-square-media' : 'with-sixteen-by-nine-media';
 
-    this.$editor
-      .addClass('st-block__editor--' + aspectRatioClass)
-      .html(_.template(source.html, {
-        protocol: protocol,
-        remote_id: data.remote_id,
-        width: this.$editor.width() // for videos like vine
-      }));
+    this.editor.classList.add('st-block__editor--' + aspectRatioClass);
+    this.editor.innerHTML = _.template(source.html, {
+                                protocol: protocol,
+                                remote_id: data.remote_id,
+                                width: this.editor.style.width // for videos like vine
+                              });
   },
 
   onContentPasted: function(event){
